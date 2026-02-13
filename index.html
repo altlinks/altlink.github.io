@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Connecting you...</p>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get("to") || params.get("data"); 
+    const allowed = ["tel:", "mailto:", "sms:", "whatsapp:"];
+
+    if (target && allowed.some(proto => target.startsWith(proto))) {
+        // 1. Trigger the link (Open Phone/Email app)
+        window.location.href = target;
+
+        // 2. UX Tweak: Attempt to close this "Ghost Tab" after a delay
+        // Note: Browsers are strict about this. It works best if opened via target="_blank"
+        setTimeout(function() {
+            window.close(); 
+            
+            // Fallback if window.close() is blocked by the browser:
+            document.body.innerHTML = "<div style='text-align:center; padding-top:20px; font-family:sans-serif;'>" +
+                "<p>Call initiated.</p>" +
+                "<p><a href='javascript:window.close()' style='padding:10px 20px; background:#eee; text-decoration:none; border-radius:5px;'>Close this tab</a></p>" +
+                "</div>";
+        }, 500); // 500ms delay to ensure the redirect fires first
+    } else {
+        document.body.innerHTML = "Invalid link.";
+    }
+  </script>
+</body>
+</html>
